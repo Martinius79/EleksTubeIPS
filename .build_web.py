@@ -5,7 +5,7 @@ import os
 import platform
 import subprocess
 
-Import("env")
+#Import("env")
 
 def is_tool(name):
     cmd = "where" if platform.system() == "Windows" else "which"
@@ -21,7 +21,7 @@ def build_web():
         print("Attempting to build webpage...")
         try:
             if platform.system() == "Windows":
-                print(check_output(["npm.cmd", "install", "--only=dev"]))
+                print(check_output(["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Microsoft\\VisualStudio\\NodeJs\\npm.cmd", "install", "--only=dev"]))
                 print(check_output(["node_modules\\.bin\\gulp.cmd"]))
             else:
                 print(check_output(["npm", "install"]))

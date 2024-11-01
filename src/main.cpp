@@ -6,12 +6,7 @@
 #include <ESPmDNS.h>
 #include <AsyncWiFiManager.h>
 #include <EspSNTPTimeSync.h>
-#ifndef DS1302
 #include <EspRTCTimeSync.h>
-#else
-// The SiHai clock uses a DS1302(?), but code for this seems to cause issues, so comment out for now.
-//#include <EspDS1302TimeSync.h>
-#endif
 #include <ConfigItem.h>
 #include <EEPROMConfig.h>
 #include <ImprovWiFi.h>
@@ -31,7 +26,7 @@
 #include "mqttBroker.h"
 #include "IRAMPtrArray.h"
 
-//#define DEBUG(...) { Serial.println(__VA_ARGS__); }
+#define DEBUG(...) { Serial.println(__VA_ARGS__); }
 #ifndef DEBUG
 #define DEBUG(...) {  }
 #endif
@@ -57,7 +52,7 @@ IRAMPtrArray<char*> manifest {
 	"Unknown clock hardware",
 #endif
 	// Firmware version
-	"1.5.1",
+	"1.5.0",
 	// Hardware chip/variant
 	"ESP32",
 	// Device name
@@ -93,11 +88,7 @@ AsyncWebSocket *ws = new AsyncWebSocket("/ws"); // access at ws://[esp ip]/ws
 DNSServer *dns = new DNSServer();
 AsyncWiFiManager *wifiManager = new AsyncWiFiManager(server, dns);
 TimeSync *timeSync;
-#ifndef DS1302
 RTCTimeSync *rtcTimeSync;
-#else
-//DS1302TimeSync *rtcTimeSync;
-#endif
 MQTTBroker *mqttBroker;
 
 TaskHandle_t wifiManagerTask;
@@ -114,6 +105,9 @@ QueueHandle_t weatherQueue;
 AsyncWiFiManagerParameter *hostnameParam;
 String ssid("EleksTubeIPS");
 String chipId = getChipId();
+
+#define SCLpin (22)
+#define SDApin (21)
 
 // Persistent Configuration
 StringConfigItem hostName("hostname", 63, "elekstubeips");
@@ -223,22 +217,14 @@ EEPROMConfig config(rootConfig);
 void asyncTimeSetCallback(String time) {
 	DEBUG(time);
 	tfts->setStatus("NTP time received...");
-#ifndef DS1302
+
 	rtcTimeSync->enabled(false);
-	rtcTimeSync->setDevice();
-#else
-//	rtcTimeSync->enabled(false);
-//	rtcTimeSync->setDevice();
-#endif
+	rtcTimeSync->setDS3231();
 }
 
 void asyncTimeErrorCallback(String msg) {
 	DEBUG(msg);
-#ifndef DS1302
 	rtcTimeSync->enabled(true);
-#else
-//	rtcTimeSync->enabled(true);
-#endif
 }
 
 template<class T>
@@ -436,11 +422,7 @@ void clockTaskFn(void *pArg) {
 					break;
 				default:
 					tfts->setShowDigits(true);
-#ifndef DS1302
 					if (timeSync->initialized() || rtcTimeSync->initialized()) {
-#else
-					if (timeSync->initialized() /*|| rtcTimeSync->initialized()*/) {
-#endif
 						ipsClock->loop();
 						if (ipsClock->getFourDigitDisplay() == 2 && IPSClock::getTimeOrDate().value == 0) {
 							weather->drawSingleDay(ipsClock->getBrightness(), 0, 0);
@@ -715,6 +697,7 @@ void wsHandler(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 void mainHandler(AsyncWebServerRequest *request) {
 	DEBUG("Got request")
 	request->send(LittleFS, "/index.html");
+	DEBUG("Delivered website")
 }
 
 void timeHandler(AsyncWebServerRequest *request) {
@@ -724,11 +707,7 @@ void timeHandler(AsyncWebServerRequest *request) {
 	DEBUG(String("Setting time from wifi manager") + wifiTime);
 
 	timeSync->setTime(wifiTime);
-#ifndef DS1302
 	rtcTimeSync->setTime(wifiTime);
-#else
-//	rtcTimeSync->setTime(wifiTime);
-#endif
 
 	request->send(LittleFS, "/time.html");
 }
@@ -980,7 +959,8 @@ void initFromEEPROM() {
 
 void connectedHandler() {
 	tfts->setStatus(WiFi.localIP().toString());
-	DEBUG("connectedHandler");
+	DEBUG("connectedHandler IP is:");	
+	DEBUG(WiFi.localIP().toString());
 	MDNS.end();
 	MDNS.begin(hostName.value.c_str());
 	MDNS.addService("http", "tcp", 80);
@@ -1067,15 +1047,9 @@ void setup() {
 	timeSync = new EspSNTPTimeSync(IPSClock::getTimeZone().value, asyncTimeSetCallback, asyncTimeErrorCallback);
 	timeSync->init();
 
-#ifndef DS1302
-	rtcTimeSync = new EspRTCTimeSync(RTC_SDA_PIN, RTC_SCL_PIN);
+	rtcTimeSync = new EspRTCTimeSync(SDApin, SCLpin);
 	rtcTimeSync->init();
 	rtcTimeSync->enabled(true);
-#else
-//	rtcTimeSync = new EspDS1302TimeSync(DS1302_IO, DS1302_SCLK, DS1302_CE);
-//	rtcTimeSync->init();
-//	rtcTimeSync->enabled(true);
-#endif
 
 	IPSClock::getTimeZone().setCallback(onTimezoneChanged);
 

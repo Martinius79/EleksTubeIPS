@@ -3,10 +3,10 @@ import shutil
 import re
 from version import *
 
-Import("env")
+#Import("env")
 
 def read_version():
-    src = os.path.join(env["PROJECT_DIR"], "version.txt")
+    src = os.path.join(os.environ["PROJECT_DIR"], "version.txt")
 
 def copy_and_replace(src, dest):
     with open(src, "r") as src_file:
@@ -20,22 +20,22 @@ def copy_and_replace(src, dest):
             dest_file.write(file_contents)
 
 def copy_manifests_to_release(*args, **kwargs):
-    src = os.path.join(env["PROJECT_DIR"], "web", "esp-web-tools-manifest-" + env["PIOENV"] + "-firmware-only.json")
-    dst = os.path.join(env["PROJECT_DIR"], 'releases', "esp-web-tools-manifest-" + env["PIOENV"] + "-firmware-only.json")
+    src = os.path.join(os.environ["PROJECT_DIR"], "web", "esp-web-tools-manifest-" + os.environ["PIOENV"] + "-firmware-only.json")
+    dst = os.path.join(os.environ["PROJECT_DIR"], 'releases', "esp-web-tools-manifest-" + os.environ["PIOENV"] + "-firmware-only.json")
     copy_and_replace(src, dst)
-    src = os.path.join(env["PROJECT_DIR"], "web", "esp-web-tools-manifest-" + env["PIOENV"] + ".json")
-    dst = os.path.join(env["PROJECT_DIR"], 'releases', "esp-web-tools-manifest-" + env["PIOENV"] + ".json")
+    src = os.path.join(os.environ["PROJECT_DIR"], "web", "esp-web-tools-manifest-" + os.environ["PIOENV"] + ".json")
+    dst = os.path.join(os.environ["PROJECT_DIR"], 'releases', "esp-web-tools-manifest-" + os.environ["PIOENV"] + ".json")
     copy_and_replace(src, dst)
 
 def copy_firmware_to_release(*args, **kwargs):
-    src = os.path.join(env["PROJECT_DIR"], env.GetBuildPath("$BUILD_DIR"), env.GetBuildPath("${PROGNAME}.bin"))
-    dst = os.path.join(env["PROJECT_DIR"], 'releases', "firmware-" + env["PIOENV"] + "-" + version + ".bin")
+    src = os.path.join(os.environ["PROJECT_DIR"], env.GetBuildPath("$BUILD_DIR"), env.GetBuildPath("${PROGNAME}.bin"))
+    dst = os.path.join(os.environ["PROJECT_DIR"], 'releases', "firmware-" + os.environ["PIOENV"] + "-" + version + ".bin")
     #print(src + " " + dst)
     shutil.copy(src, dst)
 
 def copy_fs_to_release(*args, **kwargs):
-    src = os.path.join(env["PROJECT_DIR"], env.GetBuildPath("$BUILD_DIR"), env.GetBuildPath("${ESP32_FS_IMAGE_NAME}.bin"))
-    dst = os.path.join(env["PROJECT_DIR"], 'releases', env.GetBuildPath("$ESP32_FS_IMAGE_NAME") + "-" + version + ".bin")
+    src = os.path.join(os.environ["PROJECT_DIR"], env.GetBuildPath("$BUILD_DIR"), env.GetBuildPath("${ESP32_FS_IMAGE_NAME}.bin"))
+    dst = os.path.join(os.environ["PROJECT_DIR"], 'releases', env.GetBuildPath("$ESP32_FS_IMAGE_NAME") + "-" + version + ".bin")
     #print(src + " " + dst)
     shutil.copy(src, dst)
 
