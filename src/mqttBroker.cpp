@@ -6,7 +6,7 @@
 
 #include "ScreenSaver.h"
 #include "mqttBroker.h"
-#ifdef MQTT2
+#ifdef MQTT1
 #include "IRAMPtrArray.h"
 
 extern AsyncWiFiManager *wifiManager;

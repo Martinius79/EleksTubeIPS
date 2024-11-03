@@ -1255,13 +1255,15 @@ void setup() {
 	);
 #endif
 
+#ifdef MQTT1
 	DEBUG("MQTT Setup...");
-	// mqttBroker = new MQTTBroker();
-	// MQTTBroker::getHost().setCallback(onMqttParamsChanged);
-	// MQTTBroker::getPort().setCallback(onMqttParamsChanged);
-	// MQTTBroker::getUser().setCallback(onMqttParamsChanged);
-	// MQTTBroker::getPassword().setCallback(onMqttParamsChanged);
-	// mqttBroker->init(ssid);
+	mqttBroker = new MQTTBroker();
+	MQTTBroker::getHost().setCallback(onMqttParamsChanged);
+	MQTTBroker::getPort().setCallback(onMqttParamsChanged);
+	MQTTBroker::getUser().setCallback(onMqttParamsChanged);
+	MQTTBroker::getPassword().setCallback(onMqttParamsChanged);
+	mqttBroker->init(ssid);
+#endif
 
     Serial.print("setup() running on core ");
     Serial.println(xPortGetCoreID());
