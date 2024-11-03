@@ -6,6 +6,7 @@
 
 #include "ScreenSaver.h"
 #include "mqttBroker.h"
+#ifdef MQTT2
 #include "IRAMPtrArray.h"
 
 extern AsyncWiFiManager *wifiManager;
@@ -204,3 +205,4 @@ void MQTTBroker::sendHADiscoveryMessage() {
 
     publishState();
 }
+#endif
