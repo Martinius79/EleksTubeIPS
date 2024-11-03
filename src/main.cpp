@@ -31,7 +31,7 @@
 #include "mqttBroker.h"
 #include "IRAMPtrArray.h"
 
-//#define DEBUG(...) { Serial.println(__VA_ARGS__); }
+#define DEBUG(...) { Serial.println(__VA_ARGS__); }
 #ifndef DEBUG
 #define DEBUG(...) {  }
 #endif
