@@ -21,11 +21,11 @@ def build_web():
         print("Attempting to build webpage...")
         try:
             if platform.system() == "Windows":
-                print(check_output(["npm.cmd", "install", "--only=dev"]))
-                print(check_output(["node_modules\\.bin\\gulp.cmd"]))
+                print(check_output(["npm.cmd", "install"], text=True))
+                print(check_output(["node_modules\\.bin\\gulp.cmd"], text=True))
             else:
-                print(check_output(["npm", "install"]))
-                print(check_output(["node_modules/.bin/gulp"]))
+                print(check_output(["npm", "install"], text=True))
+                print(check_output(["node_modules/.bin/gulp"], text=True))
         except OSError as e:
             print("Encountered error OSError building webpage:", e)
             if e.filename:

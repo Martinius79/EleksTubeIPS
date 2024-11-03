@@ -66,10 +66,10 @@
   #define BACKLIGHTS_PIN (12)
 
   // No Buttons on SE verion -- gesture sensor not included in code 
-  #define BUTTON_LEFT_PIN (33)
-  #define BUTTON_MODE_PIN (32)
-  #define BUTTON_RIGHT_PIN (35)
-  #define BUTTON_POWER_PIN (34)
+  #define BUTTON_LEFT_PIN (3)
+  #define BUTTON_MODE_PIN (3)
+  #define BUTTON_RIGHT_PIN (3)
+  #define BUTTON_POWER_PIN (3)
 
   // I2C to DS3231 RTC.
   #define RTC_SCL_PIN (22)
